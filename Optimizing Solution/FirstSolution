@@ -1,0 +1,89 @@
+"""
+Basic Solution for finding unique prime numbers in binary strings.
+This solution works but isn't optimized for large inputs.
+"""
+import time
+
+def is_prime(n):
+    """
+    Check if a number is prime.
+    Basic implementation with O(n) time complexity.
+    """
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+def find_binary_primes(binary_str, max_value):
+    """
+    Find all unique prime numbers hidden in the binary string that are less than max_value.
+    Basic implementation that generates all possible substrings.
+    """
+    # Validate input
+    if not all(bit in '01' for bit in binary_str):
+        return "0: Invalid binary strings"
+
+    primes = set()
+
+    # Generate all possible substrings
+    for i in range(len(binary_str)):
+        for j in range(i+1, len(binary_str)+1):
+            # Extract substring
+            sub = binary_str[i:j]
+
+            # Convert binary to decimal
+            try:
+                decimal_value = int(sub, 2)
+
+                # Check if it's prime and less than max_value
+                if decimal_value < max_value and is_prime(decimal_value):
+                    primes.add(decimal_value)
+            except ValueError:
+                continue
+
+    # Sort primes for output
+    sorted_primes = sorted(list(primes))
+
+    # Format output based on number of primes
+    if len(sorted_primes) < 6:
+        primes_str = ", ".join(map(str, sorted_primes))
+    else:
+        first_three = sorted_primes[:3]
+        last_three = sorted_primes[-3:]
+        primes_str = ", ".join(map(str, first_three + last_three))
+
+    return f"{len(sorted_primes)}: {primes_str}"
+
+# Test with examples from the assignment
+def run_test_cases():
+    test_cases = [
+        ("101011", 99),
+        ("0110", 5),
+        ("COMP", 4),
+        ("0100001101001111", 999999),  # Test case 1
+        ("01000011010011110100110101010000", 999999),  # Test case 2
+        ("1111111111111111111111111111111111111111", 999999),  # Test case 3
+    ]
+
+    for idx, (binary_str, max_value) in enumerate(test_cases, 1):
+        start_time = time.time()
+        result = find_binary_primes(binary_str, max_value)
+        end_time = time.time()
+        execution_time = end_time - start_time
+
+        print(f"Test case {idx}:")
+        print(f"Input: {binary_str}, {max_value}")
+        print(f"Output: {result}")
+        print(f"Execution time: {execution_time:.6f} seconds")
+        print("-" * 50)
+
+if __name__ == "__main__":
+    run_test_cases()
